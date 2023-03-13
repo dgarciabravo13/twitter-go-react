@@ -3,10 +3,10 @@ package bd
 import (
 	"context"
 	"time"
+
 	"twitter-go-react/models"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // LeoTweetsSeguidores lee los tweets de mis seguidores
@@ -24,7 +24,7 @@ func LeoTweetsSeguidores(ID string, pagina int) ([]models.DevuelvoTweetsSeguidor
 	condiciones = append(condiciones, bson.M{
 		"$lookup": bson.M{
 			"from":         "tweet",
-			"localfield":   "usuariorelacionid",
+			"localField":   "usuariorelacionid",
 			"foreignField": "userid",
 			"as":           "tweet",
 		}})
@@ -33,15 +33,10 @@ func LeoTweetsSeguidores(ID string, pagina int) ([]models.DevuelvoTweetsSeguidor
 	condiciones = append(condiciones, bson.M{"$skip": skip})
 	condiciones = append(condiciones, bson.M{"$limit": 20})
 
-	var cursor *mongo.Cursor
-	var err error
-
-	cursor, _ = col.Aggregate(ctx, condiciones)
+	cursor, _ := col.Aggregate(ctx, condiciones)
 
 	var result []models.DevuelvoTweetsSeguidores
-
-	err = cursor.All(ctx, &result)
-
+	err := cursor.All(ctx, &result)
 	if err != nil {
 		return result, false
 	}
